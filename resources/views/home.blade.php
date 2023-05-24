@@ -37,7 +37,7 @@
                                     <td>{{$bh->satuanRelasi->nm_satuan}}</td>
                                     <td class="text-end">{{number_format($bh->harga, 0, ',', '.')}}</td>
                                     <td class="text-center">
-                                        <button class="btn btn-sm btn-primary"><i class="fas fa-pen"></i></button>
+                                        <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
                                         <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
@@ -77,13 +77,13 @@
                                     <td>{{$pr->satuanRelasi->eceran}}</td>
                                     <td class="text-end">
                                         @php
-                                        $hargaper = ($pr->bahan->harga / $pr->satuanRelasi->jumlah) * $pr->jumlah;
+                                        $hargaper = ($pr->bahan->harga / ($pr->bahan->jumlah * $pr->satuanRelasi->jumlah)) * $pr->jumlah;
                                         $total += $hargaper;
                                         @endphp
                                         {{number_format($hargaper, 0, ',', '.')}}
                                     </td>
                                     <td class="text-center">
-                                        <button class="btn btn-sm btn-primary"><i class="fas fa-pen"></i></button>
+                                        <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
                                         <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
@@ -100,13 +100,14 @@
 
         <div class="card mt-3 shadow" style="border: 0; border-radius: 10px;">
             <div class="card-body">
-                Biaya produksi untuk setiap kemasan "Snaki" adalah : {{number_format($total, 0, ',', '.')}} Rupiah.
+                Biaya produksi untuk setiap kemasan "Snaki" adalah :
+                <b class="float-end" style="font-size: 1.5em;">Rp {{number_format($total, 0, ',', '.')}}</b>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal ADD -->
 <div class="modal fade" id="addBahan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -150,14 +151,62 @@
         </div>
     </div>
 </div>
+
+<!-- Modal EDIT -->
+<div class="modal fade" id="edtBahan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary">
+                <h5 class="modal-title text-white" id="titleEdtBahan"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="">
+                @method('PUT')
+                @csrf
+                <input type="hidden" id="edttipe" name="edttipe">
+                <div class="modal-body">
+                    <div class="form-group mb-2" id="edtinpBahan">
+                        <label>Nama Bahan</label>
+                        <input type="text" class="form-control" id="edtnm_bahan" name="edtnm_bahan">
+                    </div>
+                    <div class="form-group mb-2" id="edtinpSelect">
+                        <label>Nama Bahan</label>
+                        <select class="form-select" id="edtnm_bahan" name="edtnm_bahan">
+                            <option selected>--PILIH BAHAN--</option>
+                            @foreach ($bahan as $bh)
+                            <option value="{{$bh->id_bahan}}">{{$bh->nm_bahan}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Jumlah Bahan</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="edtjumlah" name="edtjumlah">
+                            <span class="input-group-text" id="edtspnSatuan">kg</span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-2" id="edtinpHarga">
+                        <label>Harga</label>
+                        <input type="number" min="1" class="form-control" id="edtharga" name="edtharga">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnEdtSubmit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
 <script>
-    let myModal = new bootstrap.Modal(document.getElementById('addBahan'), {})
+    var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content')
+    let addModal = new bootstrap.Modal(document.getElementById('addBahan'), {})
+    let edtModal = new bootstrap.Modal(document.getElementById('edtBahan'), {})
 
     function openMdl(tipe) {
-        myModal.show()
+        addModal.show()
         $('#tipe').val(tipe)
         if (tipe === 'bahan') {
             $('#titleAddBahan').text('Tambah Bahan Baku')
@@ -172,6 +221,68 @@
             $('#inpSelect').removeClass('d-none')
             $('#spnSatuan').text('gram')
         }
+    }
+
+    function openEdtMdl(id, tipe) {
+        var url = '{{ route("home.show", ":id") }}'
+        url = url.replace(':id', id)
+        var urledt = '{{ route("home.update", ":id") }}'
+        urledt = urledt.replace(':id', id)
+        $('#edttipe').val(tipe)
+        if (tipe === 'bahan') {
+            $('#titleEdtBahan').text('Edit Bahan Baku')
+            $('#edtinpHarga').removeClass('d-none')
+            $('#edtinpBahan').removeClass('d-none')
+            $('#edtinpSelect').addClass('d-none')
+            $('#edtspnSatuan').text('kg')
+        } else {
+            $('#titleEdtBahan').text('Edit Bahan Produk')
+            $('#edtinpHarga').addClass('d-none')
+            $('#edtinpBahan').addClass('d-none')
+            $('#edtinpSelect').removeClass('d-none')
+            $('#edtspnSatuan').text('gram')
+        }
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: {
+                _token: CSRF_TOKEN,
+                'tipe': tipe,
+            },
+            dataType: 'json',
+            success: function(result) {
+                if (result.success) {
+                    $('[name="edtnm_bahan"]').val(result.data.nm_bahan)
+                    $('#edtjumlah').val(result.data.jumlah)
+                    $('#edtharga').val(result.data.harga)
+                    edtModal.show()
+                }
+            }
+        })
+
+        $('#btnEdtSubmit').on('click', function() {
+            var edtnm_bahan = $('[name="edtnm_bahan"]').val()
+            var edtjumlah = $('#edtjumlah').val()
+            var edtharga = $('#edtharga').val()
+            $.ajax({
+                type: 'PUT',
+                url: url,
+                data: {
+                    _token: CSRF_TOKEN,
+                    'tipe': tipe,
+                    'edtnm_bahan': edtnm_bahan,
+                    'edtjumlah': edtjumlah,
+                    'edtharga': edtharga,
+                },
+                dataType: 'json',
+                success: function(result) {
+                    if (result.success) {
+                        console.log(result)
+                        location.reload()
+                    }
+                }
+            })
+        })
     }
 </script>
 @endsection
