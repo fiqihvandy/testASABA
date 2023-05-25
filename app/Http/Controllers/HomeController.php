@@ -23,7 +23,7 @@ class HomeController extends Controller
         } else {
             $data = Produk::find($id);
         }
-        $result = ['success' => true, 'data' => $data];
+        $result = ['success' => true, 'data' => $data, 'satuan' => $data->satuanRelasi];
         return json_encode($result);
     }
 
@@ -38,12 +38,12 @@ class HomeController extends Controller
             $bahan->save();
         } else {
             $produk = new Produk;
-            $produk->nm_bahan = $request->nm_bahan;
+            $produk->nm_bahan = $request->nm_bahans;
             $produk->jumlah = $request->jumlah;
             $produk->satuan = 1;
             $produk->save();
         }
-        return redirect()->back()->with('success', 'your message,here');
+        return redirect()->back()->with('success', 'Berhasil menambahkan data!');
     }
 
     public function update($id, Request $request)
@@ -63,6 +63,18 @@ class HomeController extends Controller
             $produk->save();
         }
         $result = ['success' => true, 'msg' => 'Berhasil edit data!'];
+        return json_encode($result);
+    }
+
+    public function destroy($id, Request $request)
+    {
+        $tipe = $request->tipe;
+        if ($tipe === 'bahan') {
+            Bahan::find($id)->delete();
+        } else {
+            Produk::find($id)->delete();
+        }
+        $result = ['success' => true, 'msg' => 'Berhasil menghapus data!'];
         return json_encode($result);
     }
 }

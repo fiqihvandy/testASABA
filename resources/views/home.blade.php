@@ -6,8 +6,8 @@
         <p style="font-weight: 600;">PT. Jawa Food Sejahtera</p>
 
         <div class="card mt-4 shadow" style="border: 0; border-radius: 10px;">
-            <div class="card-body">
-                Aplikasi simulasi produksi makanan "Snaki" adalah sebuah solusi interaktif yang dirancang untuk membantu pengguna memperoleh hasil produksi yang maksimal. Aplikasi ini menyediakan kemampuan untuk mengubah jumlah kebutuhan bahan baku dan harga bahan baku, sehingga pengguna dapat mengeksplorasi skenario produksi yang berbeda untuk mendapatkan hasil optimal.
+            <div class="card-body" style="text-align: justify;">
+                Aplikasi simulasi produksi makanan "Snaki" adalah sebuah solusi interaktif untuk membantu pengguna memperoleh hasil produksi yang maksimal. Aplikasi ini menyediakan kemampuan untuk mengubah jumlah kebutuhan bahan baku dan harga bahan baku, sehingga pengguna dapat mengeksplorasi skenario produksi yang berbeda untuk mendapatkan hasil optimal.
             </div>
         </div>
 
@@ -15,14 +15,15 @@
             <div class="col">
                 <div class="card shadow my-1">
                     <div class="card-header">
-                        BAHAN BAKU
+                        Daftar bahan baku
                         <button class="btn btn-sm btn-success float-end" onclick="openMdl('bahan')"><i class="fas fa-plus mr-1"></i> Tambah Bahan</button>
                     </div>
                     <div class="card-body">
+                        @if ($bahan->isNotEmpty())
                         <table class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>Nama</td>
+                                    <th>Nama Bahan</td>
                                     <th>Jumlah</th>
                                     <th>Satuan</th>
                                     <th>Harga (Rp)</th>
@@ -38,12 +39,15 @@
                                     <td class="text-end">{{number_format($bh->harga, 0, ',', '.')}}</td>
                                     <td class="text-center">
                                         <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        @else
+                        <p>Data kosong lakukan tambah bahan terlebih dahulu!</p>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -51,7 +55,7 @@
             <div class="col">
                 <div class="card shadow my-1">
                     <div class="card-header">
-                        PRODUKSI <b>@ Snaki</b>
+                        Bahan baku yang digunakan
                         <button class="btn btn-sm btn-success float-end" onclick="openMdl('produk')"><i class="fas fa-plus mr-1"></i> Tambah Bahan</button>
                     </div>
                     <div class="card-body">
@@ -59,7 +63,7 @@
                         <table class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>Nama</td>
+                                    <th>Nama Bahan</td>
                                     <th>Jumlah</th>
                                     <th>Satuan</th>
                                     <th>Harga (Rp)</th>
@@ -84,7 +88,7 @@
                                     </td>
                                     <td class="text-center">
                                         <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -101,7 +105,7 @@
         <div class="card mt-3 shadow" style="border: 0; border-radius: 10px;">
             <div class="card-body">
                 Biaya produksi untuk setiap kemasan "Snaki" adalah :
-                <b class="float-end" style="font-size: 1.5em;">Rp {{number_format($total, 0, ',', '.')}}</b>
+                <b class="float-end" style="font-size: 1.5em;">Rp {{number_format((isset($total) ? $total : 0), 0, ',', '.')}}</b>
             </div>
         </div>
     </div>
@@ -125,7 +129,7 @@
                     </div>
                     <div class="form-group mb-2" id="inpSelect">
                         <label>Nama Bahan</label>
-                        <select class="form-select" id="nm_bahan" name="nm_bahan">
+                        <select class="form-select" id="nm_bahans" name="nm_bahans">
                             <option selected>--PILIH BAHAN--</option>
                             @foreach ($bahan as $bh)
                             <option value="{{$bh->id_bahan}}">{{$bh->nm_bahan}}</option>
@@ -171,7 +175,7 @@
                     </div>
                     <div class="form-group mb-2" id="edtinpSelect">
                         <label>Nama Bahan</label>
-                        <select class="form-select" id="edtnm_bahan" name="edtnm_bahan">
+                        <select class="form-select" id="edtnm_bahans" name="edtnm_bahan">
                             <option selected>--PILIH BAHAN--</option>
                             @foreach ($bahan as $bh)
                             <option value="{{$bh->id_bahan}}">{{$bh->nm_bahan}}</option>
@@ -197,6 +201,42 @@
         </div>
     </div>
 </div>
+
+<!-- Modal DELETE -->
+<div class="modal fade" id="delBahan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title text-white" id="titleEdtBahan"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="">
+                @method('DELETE')
+                @csrf
+                <input type="hidden" id="delid_bahan" name="delid_bahan">
+                <div class="modal-body">
+                    <p>Apakah anda yakin menghapus data :</p>
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nama</td>
+                                <th>Jumlah</th>
+                                <th>Satuan</th>
+                                <th>Harga (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbDelMdl">
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnDelSubmit" class="btn btn-danger"><i class="fas fa-check"></i> Ya, Hapus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -204,6 +244,7 @@
     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content')
     let addModal = new bootstrap.Modal(document.getElementById('addBahan'), {})
     let edtModal = new bootstrap.Modal(document.getElementById('edtBahan'), {})
+    let delModal = new bootstrap.Modal(document.getElementById('delBahan'), {})
 
     function openMdl(tipe) {
         addModal.show()
@@ -234,13 +275,11 @@
             $('#edtinpHarga').removeClass('d-none')
             $('#edtinpBahan').removeClass('d-none')
             $('#edtinpSelect').addClass('d-none')
-            $('#edtspnSatuan').text('kg')
         } else {
             $('#titleEdtBahan').text('Edit Bahan Produk')
             $('#edtinpHarga').addClass('d-none')
             $('#edtinpBahan').addClass('d-none')
             $('#edtinpSelect').removeClass('d-none')
-            $('#edtspnSatuan').text('gram')
         }
         $.ajax({
             type: 'GET',
@@ -255,13 +294,18 @@
                     $('[name="edtnm_bahan"]').val(result.data.nm_bahan)
                     $('#edtjumlah').val(result.data.jumlah)
                     $('#edtharga').val(result.data.harga)
+                    $('#edtspnSatuan').text((tipe === 'bahan' ? result.data.satuan_relasi.nm_satuan : result.data.satuan_relasi.eceran))
                     edtModal.show()
                 }
             }
         })
 
         $('#btnEdtSubmit').on('click', function() {
-            var edtnm_bahan = $('[name="edtnm_bahan"]').val()
+            if (tipe === 'bahan') {
+                var edtnm_bahan = $('#edtnm_bahan').val()
+            } else {
+                var edtnm_bahan = $('#edtnm_bahans').val()
+            }
             var edtjumlah = $('#edtjumlah').val()
             var edtharga = $('#edtharga').val()
             $.ajax({
@@ -277,7 +321,48 @@
                 dataType: 'json',
                 success: function(result) {
                     if (result.success) {
-                        console.log(result)
+                        location.reload()
+                    }
+                }
+            })
+        })
+    }
+
+    function openDelMdl(id, tipe) {
+        var url = '{{ route("home.show", ":id") }}'
+        url = url.replace(':id', id)
+        var urldel = '{{ route("home.destroy", ":id") }}'
+        urldel = urldel.replace(':id', id)
+        $('#delid_bahan').val(id)
+
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: {
+                _token: CSRF_TOKEN,
+                'tipe': tipe,
+            },
+            dataType: 'json',
+            success: function(result) {
+                if (result.success) {
+                    $('#tbDelMdl').empty()
+                    $('#tbDelMdl').append('<tr><td>' + result.data.nm_bahan + '</td><td class="text-end">' + result.data.jumlah + '</td><td>' + (tipe === 'bahan' ? result.data.satuan_relasi.nm_satuan : result.data.satuan_relasi.eceran) + '</td><td class="text-end">' + result.data.harga + '</td></tr>')
+                    delModal.show()
+                }
+            }
+        })
+
+        $('#btnDelSubmit').on('click', function() {
+            $.ajax({
+                type: 'DELETE',
+                url: urldel,
+                data: {
+                    _token: CSRF_TOKEN,
+                    'tipe': tipe,
+                },
+                dataType: 'json',
+                success: function(result) {
+                    if (result.success) {
                         location.reload()
                     }
                 }
