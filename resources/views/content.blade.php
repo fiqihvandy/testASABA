@@ -13,7 +13,7 @@
                             <th>Nama Bahan</td>
                             <th>Jumlah</th>
                             <th>Satuan</th>
-                            <th>Harga (Rp)</th>
+                            <th>Harga</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -25,8 +25,8 @@
                             <td>{{$bh->satuanRelasi->nm_satuan}}</td>
                             <td class="text-end">{{number_format($bh->harga, 0, ',', '.')}}</td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
-                                <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-sm my-1 btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
+                                <button class="btn btn-sm my-1 btn-danger" onclick="openDelMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                         @endforeach
@@ -53,7 +53,7 @@
                             <th>Nama Bahan</td>
                             <th>Jumlah</th>
                             <th>Satuan</th>
-                            <th>Harga (Rp)</th>
+                            <th>Harga</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -74,8 +74,8 @@
                                 {{number_format($hargaper, 0, ',', '.')}}
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
-                                <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-trash"></i></button>
+                                <button class="btn btn-sm my-1 btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
+                                <button class="btn btn-sm my-1 btn-danger" onclick="openDelMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>
                         @endforeach
@@ -89,7 +89,7 @@
     </div>
 </div>
 
-<div class="card mt-3 shadow" style="border: 0; border-radius: 10px;">
+<div class="card my-3 shadow" style="border: 0; border-radius: 10px;">
     <div class="card-body">
         Biaya produksi untuk setiap kemasan "Snaki" adalah :
         <b class="float-end" style="font-size: 1.5em;">Rp {{number_format((isset($total) ? $total : 0), 0, ',', '.')}}</b>

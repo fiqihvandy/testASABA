@@ -15,5 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'HomeController@index');
 Route::get('/refresh', 'HomeController@refresh');
-Route::get('/bahanAll', 'HomeController@getBahan');
+Route::get('/bahan/{mode}', 'HomeController@getBahan');
+Route::get('/satuan/{id}', 'HomeController@getSatuan');
 Route::resource('home', HomeController::class);

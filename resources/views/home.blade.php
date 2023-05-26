@@ -27,7 +27,7 @@
                                         <th>Nama Bahan</td>
                                         <th>Jumlah</th>
                                         <th>Satuan</th>
-                                        <th>Harga (Rp)</th>
+                                        <th>Harga</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -39,8 +39,8 @@
                                         <td>{{$bh->satuanRelasi->nm_satuan}}</td>
                                         <td class="text-end">{{number_format($bh->harga, 0, ',', '.')}}</td>
                                         <td class="text-center">
-                                            <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
-                                            <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm my-1 btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
+                                            <button class="btn btn-sm my-1 btn-danger" onclick="openDelMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -67,7 +67,7 @@
                                         <th>Nama Bahan</td>
                                         <th>Jumlah</th>
                                         <th>Satuan</th>
-                                        <th>Harga (Rp)</th>
+                                        <th>Harga</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -88,8 +88,8 @@
                                             {{number_format($hargaper, 0, ',', '.')}}
                                         </td>
                                         <td class="text-center">
-                                            <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
-                                            <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-trash"></i></button>
+                                            <button class="btn btn-sm my-1 btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
+                                            <button class="btn btn-sm my-1 btn-danger" onclick="openDelMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="card mt-3 shadow" style="border: 0; border-radius: 10px;">
+            <div class="card my-3 shadow" style="border: 0; border-radius: 10px;">
                 <div class="card-body">
                     Biaya produksi untuk setiap kemasan "Snaki" adalah :
                     <b class="float-end" style="font-size: 1.5em;">Rp {{number_format((isset($total) ? $total : 0), 0, ',', '.')}}</b>
@@ -127,24 +127,28 @@
                 <div class="modal-body">
                     <div class="form-group mb-2" id="inpBahan">
                         <label>Nama Bahan</label>
-                        <input type="text" class="form-control" id="nm_bahan" name="nm_bahan">
+                        <input type="text" class="form-control n-val" id="nm_bahan" name="nm_bahan">
+                        <div class="invalid-feedback" id="msgnm_bahan"></div>
                     </div>
-                    <div class="form-group mb-2" id="inpSelect">
-                        <label>Nama Bahan</label>
-                        <select class="form-select" id="nm_bahans" name="nm_bahans">
+                    <div id="inpSelect">
 
-                        </select>
                     </div>
                     <div class="form-group mb-2">
                         <label>Jumlah Bahan</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="jumlah" name="jumlah">
-                            <span class="input-group-text" id="spnSatuan">kg</span>
-                        </div>
+                        <input type="number" class="form-control n-val" id="jumlah" name="jumlah">
+                        <div class="invalid-feedback" id="msgjumlah"></div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Satuan</label>
+                        <select class="form-select n-val" id="satuan" name="satuan">
+
+                        </select>
+                        <div class="invalid-feedback" id="msgsatuan"></div>
                     </div>
                     <div class="form-group mb-2" id="inpHarga">
                         <label>Harga</label>
-                        <input type="number" min="1" class="form-control" id="harga" name="harga">
+                        <input type="number" class="form-control n-val" id="harga" name="harga">
+                        <div class="invalid-feedback" id="msgharga"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -218,7 +222,7 @@
                                 <th>Nama Bahan</td>
                                 <th>Jumlah</th>
                                 <th>Satuan</th>
-                                <th id="lblDelHarga">Harga (Rp)</th>
+                                <th id="lblDelHarga">Harga</th>
                             </tr>
                         </thead>
                         <tbody id="tbDelMdl">
@@ -242,6 +246,16 @@
     let edtModal = new bootstrap.Modal(document.getElementById('edtBahan'), {})
     let delModal = new bootstrap.Modal(document.getElementById('delBahan'), {})
 
+    $('.n-val').on('change', function() {
+        if ($(this).val() != '' && $(this).val() != '0') {
+            $('#' + $(this).attr('id')).addClass('is-valid')
+            $('#' + $(this).attr('id')).removeClass('is-invalid')
+        } else {
+            $('#' + $(this).attr('id')).removeClass('is-valid')
+            $('#' + $(this).attr('id')).addClass('is-invalid')
+        }
+    })
+
     function openMdl(tipe) {
         addModal.show()
         clearAddMdl()
@@ -250,18 +264,19 @@
             $('#titleAddBahan').text('Tambah Bahan Baku')
             $('#inpHarga').removeClass('d-none')
             $('#inpBahan').removeClass('d-none')
-            $('#inpSelect').addClass('d-none')
-            $('#spnSatuan').text('kg')
+            $('#satuan').attr('disabled', false)
+            $('#inpSelect').empty();
         } else {
             $('#titleAddBahan').text('Tambah Bahan Produk')
             $('#inpHarga').addClass('d-none')
             $('#inpBahan').addClass('d-none')
-            $('#inpSelect').removeClass('d-none')
-            $('#spnSatuan').text('gram')
+            $('#satuan').attr('disabled', true)
+            $('#inpSelect').empty();
+            $('#inpSelect').append('<div class="form-group mb-2"><label>Nama Bahan</label><select class="form-select n-val" id="nm_bahans" name="nm_bahans"></select><div class="invalid-feedback" id="msgnm_bahans"></div></div>')
 
             $.ajax({
                 type: 'GET',
-                url: '{{url("/bahanAll")}}',
+                url: '{{url("/bahan/Avl")}}',
                 data: {
                     _token: CSRF_TOKEN,
                 },
@@ -279,12 +294,41 @@
         }
     }
 
+    $(document).on('change', '#nm_bahans', function() {
+        var url = '{{url("/satuan/:id")}}'
+        url = url.replace(':id', $('#nm_bahans').val())
+        $.ajax({
+            type: 'GET',
+            url: url,
+            data: {
+                _token: CSRF_TOKEN,
+            },
+            dataType: 'json',
+            success: function(result) {
+                if (result.success) {
+                    $('#satuan').val(result.data.id_satuan)
+                    $('#satuan option[value=' + result.data.id_satuan + ']').text(result.data.eceran)
+                    $('#satuan').trigger('change')
+                    $('#nm_bahans').removeClass('is-invalid')
+                    $('#nm_bahans').addClass('is-valid')
+                } else {
+                    $('#satuan').val(0)
+                    $('#satuan').trigger('change')
+                    $('#nm_bahans').addClass('is-invalid')
+                    $('#nm_bahans').removeClass('is-valid')
+                }
+            }
+        })
+    })
+
     $('#btnAddSubmit').on('click', function() {
         var tipe = $('#tipe').val()
         if (tipe === 'bahan') {
             var nm_bahan = $('#nm_bahan').val()
+            var harga = $('#harga').val()
         } else {
             var nm_bahan = $('#nm_bahans').val()
+            var harga = 1
         }
         $.ajax({
             type: 'POST',
@@ -294,13 +338,39 @@
                 'tipe': tipe,
                 'nm_bahan': nm_bahan,
                 'jumlah': $('#jumlah').val(),
-                'harga': $('#harga').val(),
+                'harga': harga,
+                'satuan': $('#satuan').val(),
             },
             dataType: 'json',
             success: function(result) {
                 if (result.success) {
                     $('#isiKonten').load('{{url("/refresh")}}')
                     addModal.hide()
+                } else {
+                    console.log(result)
+                    if (tipe === 'bahan') {
+                        if (result.errors['nm_bahan']) {
+                            $('#nm_bahan').addClass('is-invalid')
+                            $('#msgnm_bahan').text(result.errors['nm_bahan'])
+                        }
+                    } else {
+                        if (result.errors['nm_bahan']) {
+                            $('#nm_bahans').addClass('is-invalid')
+                            $('#msgnm_bahans').text(result.errors['nm_bahan'])
+                        }
+                    }
+                    if (result.errors['jumlah']) {
+                        $('#jumlah').addClass('is-invalid')
+                        $('#msgjumlah').text(result.errors['jumlah'])
+                    }
+                    if (result.errors['satuan']) {
+                        $('#satuan').addClass('is-invalid')
+                        $('#msgsatuan').text(result.errors['satuan'])
+                    }
+                    if (result.errors['harga']) {
+                        $('#harga').addClass('is-invalid')
+                        $('#msgharga').text(result.errors['harga'])
+                    }
                 }
             }
         })
@@ -325,7 +395,7 @@
 
             $.ajax({
                 type: 'GET',
-                url: '{{url("/bahanAll")}}',
+                url: '{{url("/bahan/All")}}',
                 data: {
                     _token: CSRF_TOKEN,
                 },
@@ -449,6 +519,11 @@
         $('#nm_bahan').val('')
         $('#jumlah').val('')
         $('#harga').val('')
+        $('#satuan').empty()
+        $('#satuan').append('<option value="0" selected>--PILIH SATUAN--</option><option value="1">kg</option><option value="2">biji</option>')
+        $('#satuan').val(0)
+        $('.n-val').removeClass('is-valid')
+        $('.n-val').removeClass('is-invalid')
     }
 </script>
 @endsection

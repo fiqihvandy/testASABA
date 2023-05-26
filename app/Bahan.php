@@ -10,7 +10,7 @@ class Bahan extends Model
 
     public function produk()
     {
-        return $this->belongsTo('App\Produk', 'nm_bahan', 'id_bahan');
+        return $this->belongsTo('App\Produk', 'id_bahan', 'nm_bahan');
     }
 
     public function satuanRelasi()

@@ -25,6 +25,25 @@
         body {
             background-color: #F9F871;
         }
+
+        *::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        *::-webkit-scrollbar:hover {
+            width: 20px;
+            height: 20px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background-color: #b3b3b3;
+            border: 0px;
+        }
     </style>
     @yield('style')
 </head>
