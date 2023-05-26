@@ -359,7 +359,13 @@
                 'satuan': $('#satuan').val(),
             },
             dataType: 'json',
+            beforeSend: function() {
+                $('#btnAddSubmit').attr('disabled', true)
+                $('#btnAddSubmit').text('Processing...')
+            },
             success: function(result) {
+                $('#btnAddSubmit').attr('disabled', false)
+                $('#btnAddSubmit').html('<i class="fas fa-paper-plane"></i> Simpan')
                 if (result.success) {
                     $('#isiKonten').load('{{url("/refresh")}}')
                     addModal.hide()
@@ -507,7 +513,13 @@
                     'edtharga': edtharga,
                 },
                 dataType: 'json',
+                beforeSend: function() {
+                    $('#btnEdtSubmit').attr('disabled', true)
+                    $('#btnEdtSubmit').text('Processing...')
+                },
                 success: function(result) {
+                    $('#btnEdtSubmit').attr('disabled', false)
+                    $('#btnEdtSubmit').html('<i class="fas fa-paper-plane"></i> Simpan')
                     if (result.success) {
                         $('#isiKonten').load('{{url("/refresh")}}')
                         edtModal.hide()
@@ -590,7 +602,13 @@
                     'tipe': tipe,
                 },
                 dataType: 'json',
+                beforeSend: function() {
+                    $('#btnDelSubmit').attr('disabled', true)
+                    $('#btnDelSubmit').text('Processing...')
+                },
                 success: function(result) {
+                    $('#btnDelSubmit').attr('disabled', false)
+                    $('#btnDelSubmit').html('<i class="fas fa-check"></i> Ya, Hapus')
                     if (result.success) {
                         $('#isiKonten').load('{{url("/refresh")}}')
                         delModal.hide()
