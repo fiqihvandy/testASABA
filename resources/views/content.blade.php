@@ -89,7 +89,7 @@
     </div>
 </div>
 
-<div class="card my-3 shadow" style="border: 0; border-radius: 10px;">
+<div class="card mt-3 mb-4 shadow" style="border: 0; border-radius: 10px;">
     <div class="card-body">
         Biaya produksi untuk setiap kemasan "Snaki" adalah :
         <b class="float-end" style="font-size: 1.5em;">Rp {{number_format((isset($total) ? $total : 0), 0, ',', '.')}}</b>

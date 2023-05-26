@@ -65,13 +65,16 @@ class HomeController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nm_bahan' => 'required|gt:0',
+            'nm_bahan' => $request->tipe === 'bahan' ? 'required' : 'gt:0',
             'jumlah' => 'required',
             'harga' => 'required',
             'satuan' => 'required|gt:0',
         ], [
-            'satuan.*' => 'You have to choose the satuan.',
-            'nm_bahan.gt' => 'You have to choose the nm bahan.'
+            'satuan.*' => 'Satuan harus dipilih.',
+            'nm_bahan.gt' => 'Nama bahan harus dipillih.',
+            'nm_bahan.required' => 'Nama bahan harus diisi.',
+            'jumlah.required' => 'Jumlah harus diisi.',
+            'harga.required' => 'Harga harus diisi.',
         ]);
         if ($validator->fails()) {
             $result = ['success' => false, 'errors' => $validator->errors()];
@@ -98,18 +101,35 @@ class HomeController extends Controller
 
     public function update($id, Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'edtnm_bahan' => $request->tipe === 'bahan' ? 'required' : 'gt:0',
+            'edtjumlah' => 'required',
+            'edtharga' => 'required',
+            'edtsatuan' => 'required|gt:0',
+        ], [
+            'edtsatuan.*' => 'Satuan harus dipilih.',
+            'edtnm_bahan.gt' => 'Nama bahan harus dipillih.',
+            'edtnm_bahan.required' => 'Nama bahan harus diisi.',
+            'edtjumlah.required' => 'Jumlah harus diisi.',
+            'edtharga.required' => 'Harga harus diisi.',
+        ]);
+        if ($validator->fails()) {
+            $result = ['success' => false, 'errors' => $validator->errors()];
+            return json_encode($result);
+        }
+
         if ($request->tipe === 'bahan') {
             $bahan = Bahan::find($id);
             $bahan->nm_bahan = $request->edtnm_bahan;
             $bahan->jumlah = $request->edtjumlah;
-            $bahan->satuan = 1;
+            $bahan->satuan = $request->edtsatuan;
             $bahan->harga = $request->edtharga;
             $bahan->save();
         } else {
             $produk = Produk::find($id);
             $produk->nm_bahan = $request->edtnm_bahan;
             $produk->jumlah = $request->edtjumlah;
-            $produk->satuan = 1;
+            $produk->satuan = $request->edtsatuan;
             $produk->save();
         }
         $result = ['success' => true, 'msg' => 'Berhasil edit data!'];

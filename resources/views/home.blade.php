@@ -103,7 +103,7 @@
                 </div>
             </div>
 
-            <div class="card my-3 shadow" style="border: 0; border-radius: 10px;">
+            <div class="card mt-3 mb-4 shadow" style="border: 0; border-radius: 10px;">
                 <div class="card-body">
                     Biaya produksi untuk setiap kemasan "Snaki" adalah :
                     <b class="float-end" style="font-size: 1.5em;">Rp {{number_format((isset($total) ? $total : 0), 0, ',', '.')}}</b>
@@ -131,7 +131,6 @@
                         <div class="invalid-feedback" id="msgnm_bahan"></div>
                     </div>
                     <div id="inpSelect">
-
                     </div>
                     <div class="form-group mb-2">
                         <label>Jumlah Bahan</label>
@@ -141,7 +140,6 @@
                     <div class="form-group mb-2">
                         <label>Satuan</label>
                         <select class="form-select n-val" id="satuan" name="satuan">
-
                         </select>
                         <div class="invalid-feedback" id="msgsatuan"></div>
                     </div>
@@ -174,24 +172,32 @@
                 <div class="modal-body">
                     <div class="form-group mb-2" id="edtinpBahan">
                         <label>Nama Bahan</label>
-                        <input type="text" class="form-control" id="edtnm_bahan" name="edtnm_bahan">
+                        <input type="text" class="form-control n-val" id="edtnm_bahan" name="edtnm_bahan">
+                        <div class="invalid-feedback" id="msgedtnm_bahan"></div>
                     </div>
                     <div class="form-group mb-2" id="edtinpSelect">
                         <label>Nama Bahan</label>
-                        <select class="form-select" id="edtnm_bahans" name="edtnm_bahan">
-
+                        <select class="form-select n-val" id="edtnm_bahans" name="edtnm_bahan">
                         </select>
+                        <div class="invalid-feedback" id="msgedtnm_bahans"></div>
                     </div>
                     <div class="form-group mb-2">
                         <label>Jumlah Bahan</label>
                         <div class="input-group">
-                            <input type="number" class="form-control" id="edtjumlah" name="edtjumlah">
-                            <span class="input-group-text" id="edtspnSatuan">kg</span>
+                            <input type="number" class="form-control n-val" id="edtjumlah" name="edtjumlah">
+                            <div class="invalid-feedback" id="msgedtjumlah"></div>
                         </div>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label>Satuan</label>
+                        <select class="form-select n-val n-val" id="edtsatuan" name="edtsatuan">
+                        </select>
+                        <div class="invalid-feedback" id="msgedtsatuan"></div>
                     </div>
                     <div class="form-group mb-2" id="edtinpHarga">
                         <label>Harga</label>
-                        <input type="number" min="1" class="form-control" id="edtharga" name="edtharga">
+                        <input type="number" class="form-control n-val" id="edtharga" name="edtharga">
+                        <div class="invalid-feedback" id="msgedtharga"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -347,7 +353,6 @@
                     $('#isiKonten').load('{{url("/refresh")}}')
                     addModal.hide()
                 } else {
-                    console.log(result)
                     if (tipe === 'bahan') {
                         if (result.errors['nm_bahan']) {
                             $('#nm_bahan').addClass('is-invalid')
@@ -377,6 +382,7 @@
     })
 
     function openEdtMdl(id, tipe) {
+        $('.n-val').removeClass('is-invalid')
         var url = '{{ route("home.show", ":id") }}'
         url = url.replace(':id', id)
         var urledt = '{{ route("home.update", ":id") }}'
@@ -425,20 +431,55 @@
                     $('[name="edtnm_bahan"]').val(result.data.data.nm_bahan)
                     $('#edtjumlah').val(result.data.data.jumlah)
                     $('#edtharga').val(result.data.data.harga)
-                    $('#edtspnSatuan').text((tipe === 'bahan' ? result.data.data.satuan_relasi.nm_satuan : result.data.data.satuan_relasi.eceran))
+                    $('#edtsatuan').empty()
+                    if (tipe === 'produk') {
+                        $('#edtsatuan').attr('disabled', true)
+                    } else {
+                        $('#edtsatuan').attr('disabled', false)
+                    }
+                    $('#edtsatuan').append('<option value="0" selected>--PILIH SATUAN--</option><option value="1">' + (tipe === 'bahan' ? 'kg' : 'gram') + '</option><option value="2">biji</option>')
+                    $('#edtsatuan').val(result.data.data.satuan)
                     edtModal.show()
                 }
             }
         })
 
+        $(document).on('change', '#edtnm_bahans', function() {
+            var url = '{{url("/satuan/:id")}}'
+            url = url.replace(':id', $('#edtnm_bahans').val())
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {
+                    _token: CSRF_TOKEN,
+                },
+                dataType: 'json',
+                success: function(result) {
+                    if (result.success) {
+                        $('#edtsatuan').val(result.data.id_satuan)
+                        $('#edtsatuan').trigger('change')
+                        $('#edtnm_bahans').removeClass('is-invalid')
+                        $('#edtnm_bahans').addClass('is-valid')
+                    } else {
+                        $('#edtsatuan').val(0)
+                        $('#edtsatuan').trigger('change')
+                        $('#edtnm_bahans').addClass('is-invalid')
+                        $('#edtnm_bahans').removeClass('is-valid')
+                    }
+                }
+            })
+        })
+
         $('#btnEdtSubmit').on('click', function() {
             if (tipe === 'bahan') {
                 var edtnm_bahan = $('#edtnm_bahan').val()
+                var edtharga = $('#edtharga').val()
             } else {
                 var edtnm_bahan = $('#edtnm_bahans').val()
+                var edtharga = 1
             }
             var edtjumlah = $('#edtjumlah').val()
-            var edtharga = $('#edtharga').val()
+            var edtsatuan = $('#edtsatuan').val()
             $.ajax({
                 type: 'PUT',
                 url: url,
@@ -447,6 +488,7 @@
                     'tipe': tipe,
                     'edtnm_bahan': edtnm_bahan,
                     'edtjumlah': edtjumlah,
+                    'edtsatuan': edtsatuan,
                     'edtharga': edtharga,
                 },
                 dataType: 'json',
@@ -454,6 +496,30 @@
                     if (result.success) {
                         $('#isiKonten').load('{{url("/refresh")}}')
                         edtModal.hide()
+                    } else {
+                        if (tipe === 'bahan') {
+                            if (result.errors['edtnm_bahan']) {
+                                $('#edtnm_bahan').addClass('is-invalid')
+                                $('#msgedtnm_bahan').text(result.errors['edtnm_bahan'])
+                            }
+                        } else {
+                            if (result.errors['edtnm_bahan']) {
+                                $('#edtnm_bahans').addClass('is-invalid')
+                                $('#msgedtnm_bahans').text(result.errors['edtnm_bahan'])
+                            }
+                        }
+                        if (result.errors['edtjumlah']) {
+                            $('#edtjumlah').addClass('is-invalid')
+                            $('#msgedtjumlah').text(result.errors['edtjumlah'])
+                        }
+                        if (result.errors['edtsatuan']) {
+                            $('#edtsatuan').addClass('is-invalid')
+                            $('#msgedtsatuan').text(result.errors['edtsatuan'])
+                        }
+                        if (result.errors['edtharga']) {
+                            $('#edtharga').addClass('is-invalid')
+                            $('#msgedtharga').text(result.errors['edtharga'])
+                        }
                     }
                 }
             })
