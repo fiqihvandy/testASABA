@@ -251,6 +251,17 @@
     let addModal = new bootstrap.Modal(document.getElementById('addBahan'), {})
     let edtModal = new bootstrap.Modal(document.getElementById('edtBahan'), {})
     let delModal = new bootstrap.Modal(document.getElementById('delBahan'), {})
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-right',
+        iconColor: 'white',
+        customClass: {
+            popup: 'colored-toast'
+        },
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    })
 
     $('.n-val').on('change', function() {
         if ($(this).val() != '' && $(this).val() != '0') {
@@ -352,6 +363,10 @@
                 if (result.success) {
                     $('#isiKonten').load('{{url("/refresh")}}')
                     addModal.hide()
+                    Toast.fire({
+                        icon: 'success',
+                        title: result.msg
+                    })
                 } else {
                     if (tipe === 'bahan') {
                         if (result.errors['nm_bahan']) {
@@ -496,6 +511,10 @@
                     if (result.success) {
                         $('#isiKonten').load('{{url("/refresh")}}')
                         edtModal.hide()
+                        Toast.fire({
+                            icon: 'success',
+                            title: result.msg
+                        })
                     } else {
                         if (tipe === 'bahan') {
                             if (result.errors['edtnm_bahan']) {
@@ -575,6 +594,10 @@
                     if (result.success) {
                         $('#isiKonten').load('{{url("/refresh")}}')
                         delModal.hide()
+                        Toast.fire({
+                            icon: 'success',
+                            title: result.msg
+                        })
                     }
                 }
             })
