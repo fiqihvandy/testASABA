@@ -15,15 +15,32 @@ class HomeController extends Controller
         return view('home', $data);
     }
 
+    public function refresh()
+    {
+        $data['bahan'] = Bahan::all();
+        $data['produk'] = Produk::all();
+        return view('content', $data);
+    }
+
+    public function getBahan()
+    {
+        $data = Bahan::all();
+        $result = ['success' => true, 'data' => $data];
+        return json_encode($result);
+    }
+
     public function show($id, Request $request)
     {
         $tipe = $request->tipe;
         if ($tipe === 'bahan') {
-            $data = Bahan::find($id);
+            $data['data'] = Bahan::find($id);
+            $data['satuan'] = $data['data']->satuanRelasi;
         } else {
-            $data = Produk::find($id);
+            $data['data'] = Produk::find($id);
+            $data['satuan'] = $data['data']->satuanRelasi;
+            $data['bahan'] = $data['data']->bahan;
         }
-        $result = ['success' => true, 'data' => $data, 'satuan' => $data->satuanRelasi];
+        $result = ['success' => true, 'data' => $data];
         return json_encode($result);
     }
 
@@ -38,12 +55,13 @@ class HomeController extends Controller
             $bahan->save();
         } else {
             $produk = new Produk;
-            $produk->nm_bahan = $request->nm_bahans;
+            $produk->nm_bahan = $request->nm_bahan;
             $produk->jumlah = $request->jumlah;
             $produk->satuan = 1;
             $produk->save();
         }
-        return redirect()->back()->with('success', 'Berhasil menambahkan data!');
+        $result = ['success' => true, 'msg' => 'Berhasil menambahkan data!'];
+        return json_encode($result);
     }
 
     public function update($id, Request $request)
@@ -71,6 +89,7 @@ class HomeController extends Controller
         $tipe = $request->tipe;
         if ($tipe === 'bahan') {
             Bahan::find($id)->delete();
+            Produk::where('nm_bahan', $id)->delete();
         } else {
             Produk::find($id)->delete();
         }

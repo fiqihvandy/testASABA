@@ -27,6 +27,12 @@ class Satuan extends Migration
             'jumlah' => '1000',
             'eceran' => 'gram',
         ]);
+
+        DB::table('satuans')->insert([
+            'nm_satuan' => 'biji',
+            'jumlah' => '1',
+            'eceran' => 'biji',
+        ]);
     }
 
     /**

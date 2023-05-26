@@ -11,101 +11,103 @@
             </div>
         </div>
 
-        <div class="row mt-3">
-            <div class="col">
-                <div class="card shadow my-1">
-                    <div class="card-header">
-                        Daftar bahan baku
-                        <button class="btn btn-sm btn-success float-end" onclick="openMdl('bahan')"><i class="fas fa-plus mr-1"></i> Tambah Bahan</button>
+        <div id="isiKonten">
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="card shadow my-1">
+                        <div class="card-header">
+                            Daftar bahan baku
+                            <button class="btn btn-sm btn-success float-end" onclick="openMdl('bahan')"><i class="fas fa-plus mr-1"></i> Tambah Bahan</button>
+                        </div>
+                        <div class="card-body">
+                            @if ($bahan->isNotEmpty())
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Bahan</td>
+                                        <th>Jumlah</th>
+                                        <th>Satuan</th>
+                                        <th>Harga (Rp)</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($bahan as $bh)
+                                    <tr>
+                                        <td>{{$bh->nm_bahan}}</td>
+                                        <td class="text-end">{{$bh->jumlah}}</td>
+                                        <td>{{$bh->satuanRelasi->nm_satuan}}</td>
+                                        <td class="text-end">{{number_format($bh->harga, 0, ',', '.')}}</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
+                                            <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            @else
+                            <p>Data kosong lakukan tambah bahan terlebih dahulu!</p>
+                            @endif
+                        </div>
                     </div>
-                    <div class="card-body">
-                        @if ($bahan->isNotEmpty())
-                        <table class="table table-bordered table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Nama Bahan</td>
-                                    <th>Jumlah</th>
-                                    <th>Satuan</th>
-                                    <th>Harga (Rp)</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($bahan as $bh)
-                                <tr>
-                                    <td>{{$bh->nm_bahan}}</td>
-                                    <td class="text-end">{{$bh->jumlah}}</td>
-                                    <td>{{$bh->satuanRelasi->nm_satuan}}</td>
-                                    <td class="text-end">{{number_format($bh->harga, 0, ',', '.')}}</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$bh->id_bahan}}', 'bahan')"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        @else
-                        <p>Data kosong lakukan tambah bahan terlebih dahulu!</p>
-                        @endif
+                </div>
+
+                <div class="col">
+                    <div class="card shadow my-1">
+                        <div class="card-header">
+                            Bahan baku yang digunakan
+                            <button class="btn btn-sm btn-success float-end" onclick="openMdl('produk')"><i class="fas fa-plus mr-1"></i> Tambah Bahan</button>
+                        </div>
+                        <div class="card-body">
+                            @if ($produk->isNotEmpty())
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Bahan</td>
+                                        <th>Jumlah</th>
+                                        <th>Satuan</th>
+                                        <th>Harga (Rp)</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                    $total = 0;
+                                    @endphp
+                                    @foreach ($produk as $pr)
+                                    <tr>
+                                        <td>{{$pr->bahan->nm_bahan}}</td>
+                                        <td class="text-end">{{$pr->jumlah}}</td>
+                                        <td>{{$pr->satuanRelasi->eceran}}</td>
+                                        <td class="text-end">
+                                            @php
+                                            $hargaper = ($pr->bahan->harga / ($pr->bahan->jumlah * $pr->satuanRelasi->jumlah)) * $pr->jumlah;
+                                            $total += $hargaper;
+                                            @endphp
+                                            {{number_format($hargaper, 0, ',', '.')}}
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
+                                            <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            @else
+                            <p>Data kosong lakukan tambah bahan terlebih dahulu!</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col">
-                <div class="card shadow my-1">
-                    <div class="card-header">
-                        Bahan baku yang digunakan
-                        <button class="btn btn-sm btn-success float-end" onclick="openMdl('produk')"><i class="fas fa-plus mr-1"></i> Tambah Bahan</button>
-                    </div>
-                    <div class="card-body">
-                        @if ($produk->isNotEmpty())
-                        <table class="table table-bordered table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Nama Bahan</td>
-                                    <th>Jumlah</th>
-                                    <th>Satuan</th>
-                                    <th>Harga (Rp)</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php
-                                $total = 0;
-                                @endphp
-                                @foreach ($produk as $pr)
-                                <tr>
-                                    <td>{{$pr->bahan->nm_bahan}}</td>
-                                    <td class="text-end">{{$pr->jumlah}}</td>
-                                    <td>{{$pr->satuanRelasi->eceran}}</td>
-                                    <td class="text-end">
-                                        @php
-                                        $hargaper = ($pr->bahan->harga / ($pr->bahan->jumlah * $pr->satuanRelasi->jumlah)) * $pr->jumlah;
-                                        $total += $hargaper;
-                                        @endphp
-                                        {{number_format($hargaper, 0, ',', '.')}}
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-sm btn-primary" onclick="openEdtMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-pen"></i></button>
-                                        <button class="btn btn-sm btn-danger" onclick="openDelMdl('{{$pr->id_produk}}', 'produk')"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        @else
-                        <p>Data kosong lakukan tambah bahan terlebih dahulu!</p>
-                        @endif
-                    </div>
+            <div class="card mt-3 shadow" style="border: 0; border-radius: 10px;">
+                <div class="card-body">
+                    Biaya produksi untuk setiap kemasan "Snaki" adalah :
+                    <b class="float-end" style="font-size: 1.5em;">Rp {{number_format((isset($total) ? $total : 0), 0, ',', '.')}}</b>
                 </div>
-            </div>
-        </div>
-
-        <div class="card mt-3 shadow" style="border: 0; border-radius: 10px;">
-            <div class="card-body">
-                Biaya produksi untuk setiap kemasan "Snaki" adalah :
-                <b class="float-end" style="font-size: 1.5em;">Rp {{number_format((isset($total) ? $total : 0), 0, ',', '.')}}</b>
             </div>
         </div>
     </div>
@@ -119,7 +121,7 @@
                 <h5 class="modal-title text-white" id="titleAddBahan"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{route('home.store')}}" method="post">
+            <form action="" method="post">
                 @csrf
                 <input type="hidden" id="tipe" name="tipe">
                 <div class="modal-body">
@@ -130,10 +132,7 @@
                     <div class="form-group mb-2" id="inpSelect">
                         <label>Nama Bahan</label>
                         <select class="form-select" id="nm_bahans" name="nm_bahans">
-                            <option selected>--PILIH BAHAN--</option>
-                            @foreach ($bahan as $bh)
-                            <option value="{{$bh->id_bahan}}">{{$bh->nm_bahan}}</option>
-                            @endforeach
+
                         </select>
                     </div>
                     <div class="form-group mb-2">
@@ -149,7 +148,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane"></i> Simpan</button>
+                    <button type="button" id="btnAddSubmit" class="btn btn-success"><i class="fas fa-paper-plane"></i> Simpan</button>
                 </div>
             </form>
         </div>
@@ -176,10 +175,7 @@
                     <div class="form-group mb-2" id="edtinpSelect">
                         <label>Nama Bahan</label>
                         <select class="form-select" id="edtnm_bahans" name="edtnm_bahan">
-                            <option selected>--PILIH BAHAN--</option>
-                            @foreach ($bahan as $bh)
-                            <option value="{{$bh->id_bahan}}">{{$bh->nm_bahan}}</option>
-                            @endforeach
+
                         </select>
                     </div>
                     <div class="form-group mb-2">
@@ -207,7 +203,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-danger">
-                <h5 class="modal-title text-white" id="titleEdtBahan"></h5>
+                <h5 class="modal-title text-white" id="titleDelBahan"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="">
@@ -219,10 +215,10 @@
                     <table class="table table-bordered table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Nama</td>
+                                <th>Nama Bahan</td>
                                 <th>Jumlah</th>
                                 <th>Satuan</th>
-                                <th>Harga (Rp)</th>
+                                <th id="lblDelHarga">Harga (Rp)</th>
                             </tr>
                         </thead>
                         <tbody id="tbDelMdl">
@@ -248,6 +244,7 @@
 
     function openMdl(tipe) {
         addModal.show()
+        clearAddMdl()
         $('#tipe').val(tipe)
         if (tipe === 'bahan') {
             $('#titleAddBahan').text('Tambah Bahan Baku')
@@ -261,8 +258,53 @@
             $('#inpBahan').addClass('d-none')
             $('#inpSelect').removeClass('d-none')
             $('#spnSatuan').text('gram')
+
+            $.ajax({
+                type: 'GET',
+                url: '{{url("/bahanAll")}}',
+                data: {
+                    _token: CSRF_TOKEN,
+                },
+                dataType: 'json',
+                success: function(result) {
+                    if (result.success) {
+                        $('#nm_bahans').empty()
+                        $('#nm_bahans').append('<option selected>--PILIH BAHAN--</option>')
+                        result.data.forEach(el => {
+                            $('#nm_bahans').append('<option value="' + el.id_bahan + '">' + el.nm_bahan + '</option>')
+                        })
+                    }
+                }
+            })
         }
     }
+
+    $('#btnAddSubmit').on('click', function() {
+        var tipe = $('#tipe').val()
+        if (tipe === 'bahan') {
+            var nm_bahan = $('#nm_bahan').val()
+        } else {
+            var nm_bahan = $('#nm_bahans').val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: '{{route("home.store")}}',
+            data: {
+                _token: CSRF_TOKEN,
+                'tipe': tipe,
+                'nm_bahan': nm_bahan,
+                'jumlah': $('#jumlah').val(),
+                'harga': $('#harga').val(),
+            },
+            dataType: 'json',
+            success: function(result) {
+                if (result.success) {
+                    $('#isiKonten').load('{{url("/refresh")}}')
+                    addModal.hide()
+                }
+            }
+        })
+    })
 
     function openEdtMdl(id, tipe) {
         var url = '{{ route("home.show", ":id") }}'
@@ -280,7 +322,26 @@
             $('#edtinpHarga').addClass('d-none')
             $('#edtinpBahan').addClass('d-none')
             $('#edtinpSelect').removeClass('d-none')
+
+            $.ajax({
+                type: 'GET',
+                url: '{{url("/bahanAll")}}',
+                data: {
+                    _token: CSRF_TOKEN,
+                },
+                dataType: 'json',
+                success: function(result) {
+                    if (result.success) {
+                        $('#edtnm_bahans').empty()
+                        $('#edtnm_bahans').append('<option selected>--PILIH BAHAN--</option>')
+                        result.data.forEach(el => {
+                            $('#edtnm_bahans').append('<option value="' + el.id_bahan + '">' + el.nm_bahan + '</option>')
+                        })
+                    }
+                }
+            })
         }
+
         $.ajax({
             type: 'GET',
             url: url,
@@ -291,10 +352,10 @@
             dataType: 'json',
             success: function(result) {
                 if (result.success) {
-                    $('[name="edtnm_bahan"]').val(result.data.nm_bahan)
-                    $('#edtjumlah').val(result.data.jumlah)
-                    $('#edtharga').val(result.data.harga)
-                    $('#edtspnSatuan').text((tipe === 'bahan' ? result.data.satuan_relasi.nm_satuan : result.data.satuan_relasi.eceran))
+                    $('[name="edtnm_bahan"]').val(result.data.data.nm_bahan)
+                    $('#edtjumlah').val(result.data.data.jumlah)
+                    $('#edtharga').val(result.data.data.harga)
+                    $('#edtspnSatuan').text((tipe === 'bahan' ? result.data.data.satuan_relasi.nm_satuan : result.data.data.satuan_relasi.eceran))
                     edtModal.show()
                 }
             }
@@ -321,7 +382,8 @@
                 dataType: 'json',
                 success: function(result) {
                     if (result.success) {
-                        location.reload()
+                        $('#isiKonten').load('{{url("/refresh")}}')
+                        edtModal.hide()
                     }
                 }
             })
@@ -334,6 +396,11 @@
         var urldel = '{{ route("home.destroy", ":id") }}'
         urldel = urldel.replace(':id', id)
         $('#delid_bahan').val(id)
+        if (tipe === 'bahan') {
+            $('#titleDelBahan').text('Hapus Bahan Baku')
+        } else {
+            $('#titleDelBahan').text('Hapus Bahan Produk')
+        }
 
         $.ajax({
             type: 'GET',
@@ -346,7 +413,14 @@
             success: function(result) {
                 if (result.success) {
                     $('#tbDelMdl').empty()
-                    $('#tbDelMdl').append('<tr><td>' + result.data.nm_bahan + '</td><td class="text-end">' + result.data.jumlah + '</td><td>' + (tipe === 'bahan' ? result.data.satuan_relasi.nm_satuan : result.data.satuan_relasi.eceran) + '</td><td class="text-end">' + result.data.harga + '</td></tr>')
+                    $('#tbDelMdl').append('<tr><td>' + (tipe === 'bahan' ? result.data.data.nm_bahan : result.data.data.bahan.nm_bahan) + '</td><td class="text-end">' + result.data.data.jumlah + '</td><td>' + (tipe === 'bahan' ? result.data.data.satuan_relasi.nm_satuan : result.data.data.satuan_relasi.eceran) + '</td><td class="text-end" id="txtDelHarga">' + result.data.data.harga + '</td></tr>')
+                    if (tipe === 'produk') {
+                        $('#lblDelHarga').addClass('d-none')
+                        $('#txtDelHarga').addClass('d-none')
+                    } else {
+                        $('#lblDelHarga').removeClass('d-none')
+                        $('#txtDelHarga').removeClass('d-none')
+                    }
                     delModal.show()
                 }
             }
@@ -363,11 +437,18 @@
                 dataType: 'json',
                 success: function(result) {
                     if (result.success) {
-                        location.reload()
+                        $('#isiKonten').load('{{url("/refresh")}}')
+                        delModal.hide()
                     }
                 }
             })
         })
+    }
+
+    function clearAddMdl() {
+        $('#nm_bahan').val('')
+        $('#jumlah').val('')
+        $('#harga').val('')
     }
 </script>
 @endsection
