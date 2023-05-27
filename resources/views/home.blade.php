@@ -169,6 +169,7 @@
                 @method('PUT')
                 @csrf
                 <input type="hidden" id="edttipe" name="edttipe">
+                <input type="hidden" id="edtid_bahan" name="edtid_bahan">
                 <div class="modal-body">
                     <div class="form-group mb-2" id="edtinpBahan">
                         <label>Nama Bahan</label>
@@ -219,6 +220,7 @@
             <form action="">
                 @method('DELETE')
                 @csrf
+                <input type="hidden" id="deltipe" name="deltipe">
                 <input type="hidden" id="delid_bahan" name="delid_bahan">
                 <div class="modal-body">
                     <p>Apakah anda yakin menghapus data :</p>
@@ -406,9 +408,8 @@
         $('.n-val').removeClass('is-invalid')
         var url = '{{ route("home.show", ":id") }}'
         url = url.replace(':id', id)
-        var urledt = '{{ route("home.update", ":id") }}'
-        urledt = urledt.replace(':id', id)
         $('#edttipe').val(tipe)
+        $('#edtid_bahan').val(id)
         if (tipe === 'bahan') {
             $('#titleEdtBahan').text('Edit Bahan Baku')
             $('#edtinpHarga').removeClass('d-none')
@@ -466,11 +467,11 @@
         })
 
         $(document).on('change', '#edtnm_bahans', function() {
-            var url = '{{url("/satuan/:id")}}'
-            url = url.replace(':id', $('#edtnm_bahans').val())
+            var urlst = '{{url("/satuan/:id")}}'
+            urlst = urlst.replace(':id', $('#edtnm_bahans').val())
             $.ajax({
                 type: 'GET',
-                url: url,
+                url: urlst,
                 data: {
                     _token: CSRF_TOKEN,
                 },
@@ -490,78 +491,81 @@
                 }
             })
         })
+    }
 
-        $('#btnEdtSubmit').on('click', function() {
-            if (tipe === 'bahan') {
-                var edtnm_bahan = $('#edtnm_bahan').val()
-                var edtharga = $('#edtharga').val()
-            } else {
-                var edtnm_bahan = $('#edtnm_bahans').val()
-                var edtharga = 1
-            }
-            var edtjumlah = $('#edtjumlah').val()
-            var edtsatuan = $('#edtsatuan').val()
-            $.ajax({
-                type: 'PUT',
-                url: url,
-                data: {
-                    _token: CSRF_TOKEN,
-                    'tipe': tipe,
-                    'edtnm_bahan': edtnm_bahan,
-                    'edtjumlah': edtjumlah,
-                    'edtsatuan': edtsatuan,
-                    'edtharga': edtharga,
-                },
-                dataType: 'json',
-                beforeSend: function() {
-                    $('#btnEdtSubmit').attr('disabled', true)
-                    $('#btnEdtSubmit').text('Processing...')
-                },
-                success: function(result) {
-                    $('#btnEdtSubmit').attr('disabled', false)
-                    $('#btnEdtSubmit').html('<i class="fas fa-paper-plane"></i> Simpan')
-                    if (result.success) {
-                        $('#isiKonten').load('{{url("/refresh")}}')
-                        edtModal.hide()
-                        Toast.fire({
-                            icon: 'success',
-                            title: result.msg
-                        })
+    $('#btnEdtSubmit').on('click', function() {
+        var tipe = $('#edttipe').val()
+        var id = $('#edtid_bahan').val()
+        var urledt = '{{ route("home.update", ":id") }}'
+        urledt = urledt.replace(':id', id)
+        if (tipe === 'bahan') {
+            var edtnm_bahan = $('#edtnm_bahan').val()
+            var edtharga = $('#edtharga').val()
+        } else {
+            var edtnm_bahan = $('#edtnm_bahans').val()
+            var edtharga = 1
+        }
+        var edtjumlah = $('#edtjumlah').val()
+        var edtsatuan = $('#edtsatuan').val()
+        $.ajax({
+            type: 'PUT',
+            url: urledt,
+            data: {
+                _token: CSRF_TOKEN,
+                'tipe': tipe,
+                'edtnm_bahan': edtnm_bahan,
+                'edtjumlah': edtjumlah,
+                'edtsatuan': edtsatuan,
+                'edtharga': edtharga,
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                $('#btnEdtSubmit').attr('disabled', true)
+                $('#btnEdtSubmit').text('Processing...')
+            },
+            success: function(result) {
+                $('#btnEdtSubmit').attr('disabled', false)
+                $('#btnEdtSubmit').html('<i class="fas fa-paper-plane"></i> Simpan')
+                if (result.success) {
+                    $('#isiKonten').load('{{url("/refresh")}}')
+                    edtModal.hide()
+                    Toast.fire({
+                        icon: 'success',
+                        title: result.msg
+                    })
+                } else {
+                    if (tipe === 'bahan') {
+                        if (result.errors['edtnm_bahan']) {
+                            $('#edtnm_bahan').addClass('is-invalid')
+                            $('#msgedtnm_bahan').text(result.errors['edtnm_bahan'])
+                        }
                     } else {
-                        if (tipe === 'bahan') {
-                            if (result.errors['edtnm_bahan']) {
-                                $('#edtnm_bahan').addClass('is-invalid')
-                                $('#msgedtnm_bahan').text(result.errors['edtnm_bahan'])
-                            }
-                        } else {
-                            if (result.errors['edtnm_bahan']) {
-                                $('#edtnm_bahans').addClass('is-invalid')
-                                $('#msgedtnm_bahans').text(result.errors['edtnm_bahan'])
-                            }
-                        }
-                        if (result.errors['edtjumlah']) {
-                            $('#edtjumlah').addClass('is-invalid')
-                            $('#msgedtjumlah').text(result.errors['edtjumlah'])
-                        }
-                        if (result.errors['edtsatuan']) {
-                            $('#edtsatuan').addClass('is-invalid')
-                            $('#msgedtsatuan').text(result.errors['edtsatuan'])
-                        }
-                        if (result.errors['edtharga']) {
-                            $('#edtharga').addClass('is-invalid')
-                            $('#msgedtharga').text(result.errors['edtharga'])
+                        if (result.errors['edtnm_bahan']) {
+                            $('#edtnm_bahans').addClass('is-invalid')
+                            $('#msgedtnm_bahans').text(result.errors['edtnm_bahan'])
                         }
                     }
+                    if (result.errors['edtjumlah']) {
+                        $('#edtjumlah').addClass('is-invalid')
+                        $('#msgedtjumlah').text(result.errors['edtjumlah'])
+                    }
+                    if (result.errors['edtsatuan']) {
+                        $('#edtsatuan').addClass('is-invalid')
+                        $('#msgedtsatuan').text(result.errors['edtsatuan'])
+                    }
+                    if (result.errors['edtharga']) {
+                        $('#edtharga').addClass('is-invalid')
+                        $('#msgedtharga').text(result.errors['edtharga'])
+                    }
                 }
-            })
+            }
         })
-    }
+    })
 
     function openDelMdl(id, tipe) {
         var url = '{{ route("home.show", ":id") }}'
         url = url.replace(':id', id)
-        var urldel = '{{ route("home.destroy", ":id") }}'
-        urldel = urldel.replace(':id', id)
+        $('#deltipe').val(tipe)
         $('#delid_bahan').val(id)
         if (tipe === 'bahan') {
             $('#titleDelBahan').text('Hapus Bahan Baku')
@@ -592,35 +596,39 @@
                 }
             }
         })
-
-        $('#btnDelSubmit').on('click', function() {
-            $.ajax({
-                type: 'DELETE',
-                url: urldel,
-                data: {
-                    _token: CSRF_TOKEN,
-                    'tipe': tipe,
-                },
-                dataType: 'json',
-                beforeSend: function() {
-                    $('#btnDelSubmit').attr('disabled', true)
-                    $('#btnDelSubmit').text('Processing...')
-                },
-                success: function(result) {
-                    $('#btnDelSubmit').attr('disabled', false)
-                    $('#btnDelSubmit').html('<i class="fas fa-check"></i> Ya, Hapus')
-                    if (result.success) {
-                        $('#isiKonten').load('{{url("/refresh")}}')
-                        delModal.hide()
-                        Toast.fire({
-                            icon: 'success',
-                            title: result.msg
-                        })
-                    }
-                }
-            })
-        })
     }
+
+    $('#btnDelSubmit').on('click', function() {
+        var tipe = $('#deltipe').val()
+        var id = $('#delid_bahan').val()
+        var urldel = '{{ route("home.destroy", ":id") }}'
+        urldel = urldel.replace(':id', id)
+        $.ajax({
+            type: 'DELETE',
+            url: urldel,
+            data: {
+                _token: CSRF_TOKEN,
+                'tipe': tipe,
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                $('#btnDelSubmit').attr('disabled', true)
+                $('#btnDelSubmit').text('Processing...')
+            },
+            success: function(result) {
+                $('#btnDelSubmit').attr('disabled', false)
+                $('#btnDelSubmit').html('<i class="fas fa-check"></i> Ya, Hapus')
+                if (result.success) {
+                    $('#isiKonten').load('{{url("/refresh")}}')
+                    delModal.hide()
+                    Toast.fire({
+                        icon: 'success',
+                        title: result.msg
+                    })
+                }
+            }
+        })
+    })
 
     function clearAddMdl() {
         $('#nm_bahan').val('')
